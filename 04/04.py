@@ -25,21 +25,13 @@ def let_to_num(l):
 
 def num_to_let(n):
     return string.ascii_lowercase[n%26]
-
+    
 def decrypt_name(name_string, sector):
-    #substrings = name_string.split('-')
     return ' '.join([''.join([num_to_let(let_to_num(x)+sector)
                                         for x in s])
                                for s in name_string.split('-')])
-    #for s in substrings:
-        #new_substrings.append(''.join([number_to_letter(letter_to_number(x)+
-        #                                                sector) for x in s]))
-    #return ' '.join(new_substrings)
-
 def decrypt_string(s):
-    nms = get_encrypted_name(s)
-    sec = get_sector(s)
-    return decrypt_name(nms, sec)
+    return decrypt_name(get_encrypted_name(s), get_sector(s))
     
 if __name__ == '__main__':
     import sys

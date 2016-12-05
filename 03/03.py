@@ -26,10 +26,8 @@ def reshape_array(ary):
 def count_valid2(fname):
     valid = 0
     invalid = 0
-    r = []
     with open(fname) as thefile:
-        for line in thefile:
-            r.append([int(x) for x in line.split()])
+        r = [[int(x) for x in line.split()] for line in thefile]
     new_tris = reshape_array(r)
     for triangle in new_tris:
         if valid_triangle(triangle):

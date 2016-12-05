@@ -20,19 +20,21 @@ def make_checksum(s):
 def is_valid(s):
     return make_checksum(s)==get_checksum(s)
 
-def letter_to_number(l):
+def let_to_num(l):
     return string.ascii_lowercase.find(l)
 
-def number_to_letter(n):
+def num_to_let(n):
     return string.ascii_lowercase[n%26]
 
 def decrypt_name(name_string, sector):
-    substrings = name_string.split('-')
-    new_substrings = []
-    for s in substrings:
-        new_substrings.append(''.join([number_to_letter(letter_to_number(x)+
-                                                        sector) for x in s]))
-    return ' '.join(new_substrings)
+    #substrings = name_string.split('-')
+    return ' '.join([''.join([num_to_let(let_to_num(x)+sector)
+                                        for x in s])
+                               for s in name_string.split('-')])
+    #for s in substrings:
+        #new_substrings.append(''.join([number_to_letter(letter_to_number(x)+
+        #                                                sector) for x in s]))
+    #return ' '.join(new_substrings)
 
 def decrypt_string(s):
     nms = get_encrypted_name(s)

@@ -1,0 +1,9 @@
+def process_encrypted_string(s):
+    checksum = s[s.find('[')+1:s.find(']')]
+    return checksum
+    
+if __name__ == '__main__':
+    fname = sys.argv[1]
+    with open(fname) as thefile:
+        for s in thefile:
+            print process_encrypted_string(s)

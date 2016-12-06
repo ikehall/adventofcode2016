@@ -1,0 +1,10 @@
+import numpy as np
+from scipy.stats import mode
+def error_correction(lines):
+    alines = np.array(lines, dtype='c')
+    return ''.join(mode(alines, axis=1))
+
+if __name__ =='__main__':
+    import sys
+    with open(sys.argv[1]) as thefile:
+        print error_correction(thefile.readlines())

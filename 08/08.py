@@ -24,7 +24,7 @@ def read_instruction(ins, array):
         
 def pretty_print(array):
     for row in array:
-        print ''.join('#' if x else '.' for x in row)
+        print ''.join('#' if x else ' ' for x in row)
             
 
 if __name__ == '__main__':

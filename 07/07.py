@@ -8,9 +8,7 @@ def has_abba(s):
 
 def all_aba(s):
     def is_aba(ss):
-        #print ss
         return ss==ss[::-1] and ss[0]!=ss[1]
-    #aba = [s[i:i+3] for i in range(len(s)-2) if is_aba(s[i:i+3])]
     aba=[]
     for i in range(len(s)-2):
         if is_aba(s[i:i+3]):
@@ -18,10 +16,8 @@ def all_aba(s):
     return aba
     
 def split_by_brackets(s):
-    openmask = map(lambda c:c=='[',s)
-    closemask = map(lambda c:c==']',s)
-    openindicies = [i for i,m in enumerate(openmask) if m]
-    closeindicies = [i for i,m in enumerate(closemask) if m]
+    openindicies = [i for i,m in enumerate(map(lambda c:c=='[', s)) if m]
+    closeindicies = [i for i,m in enumerate(map(lambda c:c==']', s)) if m]
     not_in_brackets=[]
     in_brackets = []
     lastclose = 0
@@ -34,8 +30,6 @@ def split_by_brackets(s):
     
 def supports_TLS(s):
     ob, ib = split_by_brackets(s.strip())
-    #print ib, ob
-    #print [has_abba(ss) for ss in ib]
     return any(has_abba(ss) for ss in ob) and not any(has_abba(ss) for ss in ib)
 
 def supports_SSL(s):
@@ -46,10 +40,8 @@ def supports_SSL(s):
         aba += all_aba(ss)
     for ss in ib:
         bab += all_aba(ss)
-    #print aba, bab
     for test_aba in aba:
         for test_bab in bab:
-            #print test_aba, test_bab
             if test_aba[0]==test_bab[1] and test_aba[1]==test_bab[0]:
                 return True
     return False

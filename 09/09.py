@@ -44,5 +44,5 @@ if __name__ == '__main__':
         for line in l:
             newstr+= ''.join([x for x in decompress(line)])
             mysum += sum(x for x in decompressv2_sum(line))
-    print "total length ",len(newstr)
-    print 'total sum', mysum
+    print "total length v1",len(newstr)
+    print 'total sum v2', mysum

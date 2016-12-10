@@ -1,5 +1,6 @@
 from operator import mul
 
+
 #Solving with coroutines!!!
 def coroutine(func):
     def start(*args, **kwargs):

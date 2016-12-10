@@ -94,7 +94,5 @@ if __name__ == '__main__':
     with open(sys.argv[1]) as thefile:
         l = thefile.readlines()
     s = multiplier_sink()
-    print 'initalizing'
     bots, outputs = initialize_cobots(l,s)
-    print 'linking'
     link_and_initialize_bots(l, bots, outputs)

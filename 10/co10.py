@@ -1,5 +1,5 @@
 from operator import mul
-
+from collections import defaultdict
 
 #Solving with coroutines!!!
 def coroutine(func):
@@ -10,31 +10,35 @@ def coroutine(func):
     return start
 
 @coroutine
-def output(num, final_target=None):
+def output():
     val = []
+    target = None
+    num=None
     try:
         while True:
-            newval = (yield)
-            val.append(newval[0])
+            dct = (yield)
+            num = dct.get('num', None) if num is None else num
+            v = dct.get('val', None)
+            if v is not None:
+                val.append(v)
+            target = dct.get('target', None) if target is None else target
     except GeneratorExit:
-        if final_target is not None:
-            final_target.send(val)
+        if target is not None:
+            target.send(val)
         
 @coroutine
-def cobot(num):
+def cobot():
+    num = None
     hi = None
     lo = None
     vals = []
     while True:
-        tpl = (yield)
-
-        #Got a pair of bots to send hi and lo values
-        if len(tpl) == 2:
-            lo, hi = tpl
-
-        #got a value
-        else:
-            vals += tpl
+        dct = (yield)
+        num = dct.get('num', None) if num is None else num
+        hi = dct.get('hi', None) if hi is None else hi
+        lo = dct.get('lo', None) if lo is None else lo
+        v = dct.get('val', None)
+        if v is not None: vals.append(v)
 
         #If we have 2 values, and know who to pass them off to,
         #do so immediately!
@@ -43,49 +47,44 @@ def cobot(num):
             #Print the result needed for part 1
             if vl==17 and vh==61:
                 print "hi, I'm cobot #%s.  I have values %d and %d"%(num,vl,vh)
-            lo.send([str(vl)])
-            hi.send([str(vh)])
+            lo.send(dict(val=str(vl)))
+            hi.send(dict(val=str(vh)))
+
+def makebot(botdict, num):
+    botdict[num].send(dict(num=num))
+
+def makeoutput(opdict, num):
+    opdict[num].send(dict(num=num))
             
 def initialize_cobots(instruction_set, sink):
-    bots = {}
-    outputs = {}
+    bots = defaultdict(cobot)
+    outputs = defaultdict(output)
     op_to_track = ['0','1','2']
     for line in instruction_set:
         l = line.split()
         if l[0]=='bot':
             _,n,_,_,_,bol,nl,_,_,_,boh,nh = l
-            bots[n] = cobot(n)
+            makebot(bots, n)
             if bol == 'bot':
-                bots[nl] = cobot(nl)
+                makebot(bots, nl)
+                lo = bots[nl]
             else:
-                outputs[nl] = output(nl, sink if nl in op_to_track else None)
+                makeoutput(outputs, nl)
+                lo = outputs[nl]
             if boh == 'bot':
-                bots[nh] = cobot(nh)
+                makebot(bots, nh)
+                hi = bots[nh]
             else:
-                outputs[nh] = output(nh, sink if nh in op_to_track else None)
+                makeoutput(outputs, nh)
+                hi = outputs[nh]
+            bots[n].send(dict(hi=hi, lo=lo))            
         else:
             n = l[-1]
-            bots[n] = cobot(n)
-    return bots, outputs
-
-def link_and_initialize_bots(instruction_set, bots, outputs):
-    #This should also start the bots going as well.
-    #They are coroutines, and thus have a mind of their own.
-    for line in instruction_set:
-        l = line.split()
-        if l[0] == 'bot':
-            _,t,_,_,_,bol,nl,_,_,_,boh,nh=l
-            target = bots[t]
-            low = bots[nl] if bol=='bot' else outputs[nl]
-            hi = bots[nh] if boh=='bot' else outputs[nh]
-            target.send([low, hi])
-        else:
-            _,v,_,_,_,n=l
-            value = [v]
-            target = bots[n]
-            target.send(value)
-    for o in outputs:
-        outputs[o].close()
+            val = l[1]
+            makebot(bots, n)
+            bots[n].send(dict(val=val))
+    for op in op_to_track:
+        outputs[op].send(dict(target=sink))
 
 @coroutine
 def multiplier_sink():
@@ -101,5 +100,4 @@ if __name__ == '__main__':
     with open(sys.argv[1]) as thefile:
         l = thefile.readlines()
     s = multiplier_sink()
-    bots, outputs = initialize_cobots(l,s)
-    link_and_initialize_bots(l, bots, outputs)
+    initialize_cobots(l,s)

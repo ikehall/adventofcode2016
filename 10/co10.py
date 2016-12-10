@@ -53,17 +53,19 @@ def initialize_cobots(instruction_set, sink):
     for line in instruction_set:
         l = line.split()
         if l[0]=='bot':
-            bots[l[1]] = cobot(l[1])
-            if l[5] == 'bot':
-                bots[l[6]] = cobot(l[6])
+            _,n,_,_,_,bol,nl,_,_,_,boh,nh = l
+            bots[n] = cobot(n)
+            if bol == 'bot':
+                bots[nl] = cobot(nl)
             else:
-                outputs[l[6]] = output(l[6]) if l[6] not in op_to_track else output(l[6], sink)
-            if l[-2] == 'bot':
-                bots[l[-1]] = cobot(l[-1])
+                outputs[nl] = output(nl, sink if nl in op_to_track else None)
+            if boh == 'bot':
+                bots[nh] = cobot(nh)
             else:
-                outputs[l[-1]] = output(l[-1]) if l[-1] not in op_to_track else output(l[-1], sink)
+                outputs[nh] = output(nh, sink if nh in op_to_track else None)
         else:
-            bots[l[-1]] = cobot(l[-1])
+            n = l[-1]
+            bots[n] = cobot(n)
     return bots, outputs
 
 def link_and_initialize_bots(instruction_set, bots, outputs):
@@ -72,13 +74,15 @@ def link_and_initialize_bots(instruction_set, bots, outputs):
     for line in instruction_set:
         l = line.split()
         if l[0] == 'bot':
-            target = bots[l[1]]
-            low = bots[l[6]] if l[5]=='bot' else outputs[l[6]]
-            hi = bots[l[-1]] if l[-2]=='bot' else outputs[l[-1]]
+            _,t,_,_,_,bol,nl,_,_,_,boh,nh=l
+            target = bots[t]
+            low = bots[nl] if bol=='bot' else outputs[nl]
+            hi = bots[nh] if boh=='bot' else outputs[nh]
             target.send([low, hi])
         else:
-            value = [l[1]]
-            target = bots[l[-1]]
+            _,v,_,_,_,n=l
+            value = [v]
+            target = bots[n]
             target.send(value)
     for o in outputs:
         outputs[o].close()

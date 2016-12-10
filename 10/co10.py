@@ -31,10 +31,13 @@ def cobot(num):
         #Got a pair of bots to send hi and lo values
         if len(tpl) == 2:
             lo, hi = tpl
+
+        #got a value
         else:
             vals += tpl
 
-        #Got a value
+        #If we have 2 values, and know who to pass them off to,
+        #do so immediately!
         if len(vals) == 2 and lo is not None:
             vl, vh = sorted(int(x) for x in vals)
             #Print the result needed for part 1

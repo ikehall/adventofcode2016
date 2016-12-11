@@ -12,8 +12,7 @@ def coroutine(func):
 @coroutine
 def output():
     val = []
-    target = None
-    num=None
+    num = target = None
     try:
         while True:
             dct = (yield)
@@ -28,9 +27,7 @@ def output():
         
 @coroutine
 def cobot():
-    num = None
-    hi = None
-    lo = None
+    num = hi = lo = None
     vals = []
     while True:
         dct = (yield)
@@ -39,23 +36,21 @@ def cobot():
         lo = dct.get('lo', None) if lo is None else lo
         v = dct.get('val', None)
         if v is not None: vals.append(v)
-
         #If we have 2 values, and know who to pass them off to,
         #do so immediately!
         if len(vals) == 2 and lo is not None:
             vl, vh = sorted(int(x) for x in vals)
-            #Print the result needed for part 1
+            #Print the result needed for part 1 if I have it
             if vl==17 and vh==61:
                 print "hi, I'm cobot #%s.  I have values %d and %d"%(num,vl,vh)
             lo.send(dict(val=str(vl)))
             hi.send(dict(val=str(vh)))
+            vals=[]
 
 def makebot(botdict, num):
     botdict[num].send(dict(num=num))
-
-def makeoutput(opdict, num):
-    opdict[num].send(dict(num=num))
-            
+    return botdict[num]
+    
 def initialize_cobots(instruction_set, sink):
     bots = defaultdict(cobot)
     outputs = defaultdict(output)
@@ -64,25 +59,15 @@ def initialize_cobots(instruction_set, sink):
         l = line.split()
         if l[0]=='bot':
             _,n,_,_,_,bol,nl,_,_,_,boh,nh = l
-            makebot(bots, n)
-            if bol == 'bot':
-                makebot(bots, nl)
-                lo = bots[nl]
-            else:
-                makeoutput(outputs, nl)
-                lo = outputs[nl]
-            if boh == 'bot':
-                makebot(bots, nh)
-                hi = bots[nh]
-            else:
-                makeoutput(outputs, nh)
-                hi = outputs[nh]
-            bots[n].send(dict(hi=hi, lo=lo))            
+            bot_n = makebot(bots, n)
+            lo = makebot(bots, nl) if bol == 'bot' else makebot(outputs, nl)
+            hi = makebot(bots, nh) if boh == 'bot' else makebot(outputs, nh)
+            bot_n.send(dict(hi=hi, lo=lo))            
         else:
             n = l[-1]
             val = l[1]
-            makebot(bots, n)
-            bots[n].send(dict(val=val))
+            bot_n = makebot(bots, n)
+            bot_n.send(dict(val=val))            
     for op in op_to_track:
         outputs[op].send(dict(target=sink))
 

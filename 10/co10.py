@@ -4,7 +4,7 @@ from collections import defaultdict
 #Solving with coroutines!!!
 #Each bot or output is a coroutine.  They expect to be sent dictionaries
 #whenever an action happens.  Those dictionaries will have keys of either
-#num, val, hi, lo for bots and val, target for outputs.  They will then
+#num, val, hi, lo for bots and num, val, target for outputs.  They will then
 #do something with the appropriate items.  When bots have 2 chips AND
 #the instructions they need to send their two chips to the next bot, they
 #will do so automagically.

@@ -39,15 +39,12 @@ def find_shortest_path(passcode, positions=None, step=0):
         positions = [((0,0), '')]
     next_positions = []
     for pos, pm in positions:
-        #print "pos=",pos,'prev=', pm
         for move in possible_moves(pos, passcode, pm):
-            #print move
             newpos = make_move(pos, move)
             npm = ''.join((pm, move))
             node = (newpos, npm)
             next_positions.append(node)
             if newpos == vaultpos:
-                #valid_moves.append(npm)
                 return npm
     if len(next_positions)==0:
         print 'No moves possible!'
@@ -59,9 +56,7 @@ def find_longest_path(passcode, positions=None, step=0, longest_path=''):
         positions = [((0,0), '')]
     next_positions = []
     for pos, pm in positions:
-        #print "pos=",pos,'prev=', pm
         for move in possible_moves(pos, passcode, pm):
-            #print move
             newpos = make_move(pos, move)
             npm = ''.join((pm, move))
             node = (newpos, npm)
